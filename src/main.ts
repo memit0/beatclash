@@ -286,4 +286,4 @@ function frame(now: number) {
 requestAnimationFrame(frame)
 show('menu')
 // dev-only hook for the browser test bot
-if (import.meta.env.DEV) Object.assign(window, { fretfall: { notes: () => notes, songTime } })
+if (import.meta.env.DEV) Object.assign(window, { beatclash: { notes: () => notes, songTime } })
