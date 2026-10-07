@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fretfall</title>
+  <link rel="preload" href="/fonts/nightmare-hero.ttf" as="font" type="font/ttf" crossorigin />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <canvas id="stage"></canvas>
+
+  <section id="menu" class="screen">
+    <div class="poster">
+      <h1 class="logo">
+        <img class="l1" src="/menu/logo-1.svg" alt="" />
+        <img class="l2" src="/menu/logo-2.svg" alt="" />
+        <img class="l3" src="/menu/logo-3.svg" alt="Beat Clash" />
+      </h1>
+      <nav class="menu-list">
+        <button id="play"><img src="/menu/career.svg" alt="Career" /></button>
+        <button id="optionsBtn" aria-expanded="false" aria-controls="settings"><img src="/menu/options.svg" alt="Options" /></button>
+        <button id="howBtn" aria-expanded="false" aria-controls="keys"><img src="/menu/tutorial.svg" alt="Tutorial" /></button>
+      </nav>
+      <div class="menu-extra">
+        <input id="file" type="file" accept="audio/*" hidden />
+        <p class="sub">or drop / paste a song anywhere</p>
+        <p id="error" class="error" role="alert"></p>
+        <div id="settings" class="settings panel" hidden>
+          <label>Difficulty
+            <select id="difficulty">
+              <option value="easy">Easy</option>
+              <option value="medium" selected>Medium</option>
+              <option value="hard">Hard</option>
+              <option value="expert">Expert</option>
+            </select>
+          </label>
+          <label>Note speed <output id="speedOut"></output>
+            <input id="speed" type="range" min="6" max="18" step="1" value="11" />
+          </label>
+          <label>Audio offset <output id="offsetOut"></output>
+            <input id="offset" type="range" min="-200" max="200" step="5" value="0" />
+          </label>
+          <label class="check"><input id="nofail" type="checkbox" /> No fail</label>
+        </div>
+        <p id="keys" class="keys panel" hidden><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><kbd>F</kbd><kbd>G</kbd> hit frets &nbsp;·&nbsp; <kbd>Space</kbd> star power &nbsp;·&nbsp; <kbd>Esc</kbd> pause</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="loading" class="screen" hidden>
+    <h2>Charting…</h2>
+    <p class="sub" id="songName"></p>
+  </section>
+
+  <section id="paused" class="screen" hidden>
+    <h2>Paused</h2>
+    <div class="row">
+      <button id="resume">Resume</button>
+      <button id="restart">Restart</button>
+      <button id="quit">Quit</button>
+    </div>
+  </section>
+
+  <section id="results" class="screen" hidden>
+    <h2 id="resultTitle">Song complete</h2>
+    <p id="stars" class="stars"></p>
+    <dl class="stats">
+      <dt>Score</dt><dd id="rScore"></dd>
+      <dt>Notes hit</dt><dd id="rHit"></dd>
+      <dt>Accuracy</dt><dd id="rAcc"></dd>
+      <dt>Best streak</dt><dd id="rStreak"></dd>
+    </dl>
+    <div class="row">
+      <button id="again">Play again</button>
+      <button id="newSong">New song</button>
+    </div>
+  </section>
+
+  <div id="hud" hidden>
+    <div class="progress"><div id="progress"></div></div>
+    <div class="score">
+      <div id="score">0</div>
+      <div id="streak"></div>
+    </div>
+    <div id="mult" class="mult">×1</div>
+    <div class="meters">
+      <div class="meter rock"><span>ROCK</span><div class="bar"><div id="rock"></div></div></div>
+      <div class="meter sp"><span>STAR</span><div class="bar"><div id="sp"></div></div></div>
+    </div>
+    <div id="countdown" class="countdown"></div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
