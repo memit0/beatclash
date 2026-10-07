@@ -83,4 +83,15 @@ kbd { display: inline-block; padding: 2px 7px; margin: 0 2px; border: 1px solid 
 .menu-list button:focus, .menu-list button[aria-expanded="true"] { transform: scale(1.06); outline: none; }
 .menu-extra { position: absolute; left: 49.03%; top: 78%; transform: translateX(-50%); width: min(640px, 92vw); display: flex; flex-direction: column; align-items: center; gap: 8px; }
 #menu .sub { color: #fff; font-weight: 700; text-shadow: 0 2px 4px #000; }
-.panel { background: var(--panel); border: 2px solid #000; border-radius: 10px; padding: 14px 18px; box-shadow: 0 6px 0 #000; }
+/* options/tutorial panels: same look as the menu buttons, white heavy caps on black with a chunky outline */
+.panel {
+  background: #111; border: 4px solid #fff; border-radius: 4px; padding: 14px 20px; transform: rotate(-1deg);
+  box-shadow: 0 0 0 4px #000, 6px 8px 0 4px #000;
+  font-family: 'Arial Black', Impact, ui-sans-serif, sans-serif; text-transform: uppercase; color: #fff;
+}
+.panel.settings label { color: #fff; font-size: 13px; letter-spacing: .04em; }
+.panel.settings output { color: var(--hi); }
+.panel select { font-family: inherit; text-transform: uppercase; color: #000; background: #fff; border: 3px solid #000; border-radius: 4px; box-shadow: 0 3px 0 #000; }
+.panel input[type="range"], .panel input[type="checkbox"] { accent-color: var(--hi); }
+.panel.keys { color: #fff; font-size: 14px; line-height: 2; }
+.panel kbd { color: #000; background: #fff; border: 2px solid #000; border-bottom-width: 4px; border-radius: 4px; font-family: inherit; }
