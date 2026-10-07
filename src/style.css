@@ -95,16 +95,16 @@ kbd { display: inline-block; padding: 2px 7px; margin: 0 2px; border: 1px solid 
 .panel input[type="range"], .panel input[type="checkbox"] { accent-color: var(--hi); }
 .panel.keys { color: #fff; font-size: 14px; line-height: 2; }
 .panel kbd { color: #000; background: #fff; border: 2px solid #000; border-bottom-width: 4px; border-radius: 4px; font-family: inherit; }
-/* end screen: poster background, logo-style outlined caps, stats in a menu panel */
+/* end + pause screens: logo-style outlined caps (end screen also gets the poster bg and a stats panel) */
 #results { background: var(--bg) url(/menu/bg.png) center / cover no-repeat; gap: 20px; }
-#results h2, #results .row button {
+#results h2, #results .row button, #paused h2, #paused .row button {
   font-family: 'Arial Black', Impact, ui-sans-serif, sans-serif; font-style: normal; text-transform: uppercase; color: #fff;
   -webkit-text-stroke: 0.22em #000; paint-order: stroke fill; text-shadow: 0 0.12em 0 #000;
 }
-#results h2 { font-size: clamp(40px, 8vw, 88px); line-height: 1; }
+#results h2, #paused h2 { font-size: clamp(40px, 8vw, 88px); line-height: 1; }
 #results .stars { color: var(--hi); -webkit-text-stroke: 6px #000; paint-order: stroke fill; text-shadow: 0 4px 0 #000; letter-spacing: 4px; }
 #results .stats { padding: 16px 28px; font-size: 18px; }
 #results .stats dt { color: #fff; }
 #results .stats dd { color: var(--hi); text-align: right; }
-#results .row button { font-size: clamp(28px, 4vw, 44px); background: none; border: 0; padding: 4px 16px; transition: transform .1s; }
-#results .row button:hover, #results .row button:focus-visible { transform: scale(1.06); outline: none; }
+#results .row button, #paused .row button { font-size: clamp(28px, 4vw, 44px); background: none; border: 0; padding: 4px 16px; transition: transform .1s; }
+#results .row button:hover, #results .row button:focus-visible, #paused .row button:hover, #paused .row button:focus-visible { transform: scale(1.06); outline: none; }
