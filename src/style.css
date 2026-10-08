@@ -82,6 +82,10 @@ kbd { display: inline-block; padding: 2px 7px; margin: 0 2px; border: 1px solid 
 .menu-list #howBtn img { width: 31.11cqw; }
 .menu-list button:focus, .menu-list button[aria-expanded="true"] { transform: scale(1.06); outline: none; }
 .menu-extra { position: absolute; left: 49.03%; top: 78%; transform: translateX(-50%); width: min(640px, 92vw); display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.yt { display: flex; gap: 8px; width: min(420px, 100%); }
+.yt input, .yt button { font: 900 14px 'Arial Black', Impact, ui-sans-serif, sans-serif; border: 3px solid #000; border-radius: 4px; box-shadow: 0 3px 0 #000; padding: 6px 10px; }
+.yt input { flex: 1; min-width: 0; color: #000; background: #fff; }
+.yt button { text-transform: uppercase; color: #000; background: var(--hi); cursor: pointer; }
 #menu .sub { color: #fff; font-weight: 700; text-shadow: 0 2px 4px #000; }
 /* options/tutorial panels: same look as the menu buttons, white heavy caps on black with a chunky outline */
 .panel {

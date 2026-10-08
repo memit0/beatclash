@@ -63,18 +63,31 @@ let buffer: AudioBuffer | null = null
 let mono: Float32Array | null = null
 
 async function loadFile(file: File | undefined) {
-  if (!file) return
+  if (file) loadSong(file.name, () => file.arrayBuffer(), `Couldn't read “${file.name}”. Try an mp3, wav, ogg or m4a file.`)
+}
+
+async function loadYouTube(url: string) {
+  let err = 'Couldn’t load that YouTube link.'
+  loadSong('Fetching from YouTube…', async () => {
+    const res = await fetch(`/yt?url=${encodeURIComponent(url)}`)
+    if (!res.ok) throw new Error(err = await res.text() || err)
+    $('songName').textContent = decodeURIComponent(res.headers.get('X-Title') ?? '') || url
+    return res.arrayBuffer()
+  }, () => err)
+}
+
+async function loadSong(name: string, bytes: () => Promise<ArrayBuffer>, error: string | (() => string)) {
   $('error').textContent = ''
-  $('songName').textContent = file.name
+  $('songName').textContent = name
   show('loading')
   try {
     await ctx.resume()
-    buffer = await ctx.decodeAudioData(await file.arrayBuffer())
+    buffer = await ctx.decodeAudioData(await bytes())
     mono = toMono(buffer)
     await startGame()
   } catch (e) {
     console.error(e)
-    $('error').textContent = `Couldn't read “${file.name}”. Try an mp3, wav, ogg or m4a file.`
+    $('error').textContent = typeof error === 'string' ? error : error()
     show('menu')
   }
 }
@@ -82,6 +95,11 @@ async function loadFile(file: File | undefined) {
 const menu = $('menu')
 $<HTMLInputElement>('file').addEventListener('change', e => loadFile((e.target as HTMLInputElement).files?.[0]))
 $('play').onclick = () => { selectSound(); $('file').click() }
+$<HTMLFormElement>('ytForm').onsubmit = e => {
+  e.preventDefault()
+  selectSound()
+  loadYouTube($<HTMLInputElement>('yt').value.trim())
+}
 for (const [btn, panel] of [['optionsBtn', 'settings'], ['howBtn', 'keys']]) {
   $(btn).onclick = () => {
     selectSound()

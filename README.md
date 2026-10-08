@@ -11,7 +11,7 @@ npm install
 npm run dev      # http://localhost:5173
 ```
 
-1. **Career** opens a file picker. Or drop/paste an audio file anywhere on the menu (mp3, wav, ogg, m4a… anything the browser can decode).
+1. **Career** opens a file picker. Or drop/paste an audio file anywhere on the menu (mp3, wav, ogg, m4a… anything the browser can decode). No local music? Paste a YouTube link into the field under the menu. This needs [`yt-dlp`](https://github.com/yt-dlp/yt-dlp) on your PATH (`brew install yt-dlp`) and only works under `npm run dev` / `vite preview`, where the dev server downloads the audio for you.
 2. Notes scroll toward the strike line. Hit them as they cross it.
 3. Get to the end of the song without your rock meter running out.
 

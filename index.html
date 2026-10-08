@@ -25,6 +25,10 @@
       <div class="menu-extra">
         <input id="file" type="file" accept="audio/*" hidden />
         <p class="sub">or drop / paste a song anywhere</p>
+        <form id="ytForm" class="yt">
+          <input id="yt" type="url" required placeholder="…or paste a YouTube link" aria-label="YouTube link" />
+          <button>Load</button>
+        </form>
         <p id="error" class="error" role="alert"></p>
         <div id="settings" class="settings panel" hidden>
           <label>Difficulty
