@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import type { Note } from './chart'
 
 export const LANE_COLORS = [0x22c55e, 0xef4444, 0xfacc15, 0x3b82f6, 0xf97316]
@@ -61,14 +62,15 @@ export class Stage {
   private flash = [0, 0, 0, 0, 0]
   private missFlash = [0, 0, 0, 0, 0]
   private gems: Gem[] = []
-  private laneMats = LANE_COLORS.map(c => new THREE.MeshLambertMaterial({ color: c, emissive: c, emissiveIntensity: 0.35 }))
+  private laneMats = LANE_COLORS.map(c => new THREE.MeshLambertMaterial({ color: c, emissive: c, emissiveIntensity: 0.35, flatShading: true }))
   private tailMats = LANE_COLORS.map(c => new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: 0.8 }))
-  private spMat = new THREE.MeshLambertMaterial({ color: SP_COLOR, emissive: SP_COLOR, emissiveIntensity: 0.6 })
+  private spMat = new THREE.MeshLambertMaterial({ color: SP_COLOR, emissive: SP_COLOR, emissiveIntensity: 0.6, flatShading: true })
   private spTailMat = new THREE.MeshBasicMaterial({ color: SP_COLOR, transparent: true, opacity: 0.8 })
   private sparks: THREE.Points
   private sparkData: Spark[] = []
   private sparkCursor = 0
   private beams: THREE.Mesh[] = []
+  private washes: THREE.PointLight[] = []
   private pulse = 0
   private clock = performance.now()
 
@@ -117,12 +119,12 @@ export class Stage {
     // strike rings + pads + flames
     const glow = glowTexture()
     LANE_COLORS.forEach((c, l) => {
-      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.36, 0.07, 12, 40), new THREE.MeshLambertMaterial({ color: c, emissive: c, emissiveIntensity: 0.2 }))
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.36, 0.07, 3, 6), new THREE.MeshLambertMaterial({ color: c, emissive: c, emissiveIntensity: 0.2, flatShading: true }))
       ring.rotation.x = -Math.PI / 2
       ring.position.set(laneX(l), 0.08, 0)
       this.rings.push(ring)
       this.scene.add(ring)
-      const pad = new THREE.Mesh(new THREE.CircleGeometry(0.3, 32), new THREE.MeshBasicMaterial({ color: 0x111111 }))
+      const pad = new THREE.Mesh(new THREE.CircleGeometry(0.3, 6), new THREE.MeshBasicMaterial({ color: 0x111111 }))
       pad.rotation.x = -Math.PI / 2
       pad.position.set(laneX(l), 0.07, 0)
       this.pads.push(pad)
@@ -134,9 +136,10 @@ export class Stage {
     })
 
     // gem pool
-    const bodyGeo = new THREE.CylinderGeometry(0.32, 0.36, 0.16, 32)
-    const capGeo = new THREE.CylinderGeometry(0.2, 0.2, 0.17, 24)
-    const capMat = new THREE.MeshLambertMaterial({ color: 0xffffff, emissive: 0x666666 })
+    // low-poly look: hexagonal notes, rings and pads with flat-shaded facets
+    const bodyGeo = new THREE.CylinderGeometry(0.32, 0.36, 0.16, 6)
+    const capGeo = new THREE.CylinderGeometry(0.2, 0.2, 0.17, 6)
+    const capMat = new THREE.MeshLambertMaterial({ color: 0xffffff, emissive: 0x666666, flatShading: true })
     const tailGeo = new THREE.BoxGeometry(0.14, 0.03, 1)
     tailGeo.translate(0, 0, -0.5) // extends away from the player
     for (let i = 0; i < POOL; i++) {
@@ -160,7 +163,7 @@ export class Stage {
     this.scene.add(this.sparks)
 
     // stage spotlight beams behind the highway
-    const beamGeo = new THREE.ConeGeometry(4, 40, 24, 1, true)
+    const beamGeo = new THREE.ConeGeometry(4, 40, 6, 1, true)
     beamGeo.translate(0, -20, 0) // apex at origin
     ;[0xff3d7f, 0x6c5cff, 0xffb347, 0x3dd6ff].forEach((c, i) => {
       const beam = new THREE.Mesh(beamGeo, new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: 0.06, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: false }))
@@ -169,8 +172,47 @@ export class Stage {
       this.scene.add(beam)
     })
 
+    this.loadProps()
     this.resize()
     addEventListener('resize', () => this.resize())
+  }
+
+  // concert props: CC0 "Concert Pack" by iPoly3D, poly.pizza/bundle/Concert-Pack-ag2DBgUKV5
+  private loadProps() {
+    // coloured wash lights so the black props read against the dark background; they pulse with the beat
+    for (const [c, x] of [[0xff3d7f, -9], [0x3dd6ff, 9]]) {
+      const wash = new THREE.PointLight(c, 40, 0, 1.2)
+      wash.position.set(x, 6, -10)
+      this.washes.push(wash)
+      this.scene.add(wash)
+    }
+    const stageLight = new THREE.PointLight(0xffb347, 600, 0, 1.6)
+    stageLight.position.set(0, 18, -48)
+    this.scene.add(stageLight)
+
+    const loader = new GLTFLoader()
+    // each model is scaled to `height`, centred on x/z and set on the floor, then copied to every [x, y, z, rotY] spot
+    const place = (file: string, height: number, spots: number[][], fog = true) =>
+      loader.load(`/models/${file}.glb`, ({ scene: model }) => {
+        const box = new THREE.Box3().setFromObject(model)
+        const size = box.getSize(new THREE.Vector3()), centre = box.getCenter(new THREE.Vector3())
+        model.position.set(-centre.x, -box.min.y, -centre.z)
+        model.traverse(o => { if (o instanceof THREE.Mesh) o.material.fog = fog })
+        const unit = new THREE.Group().add(model)
+        unit.scale.setScalar(height / size.y)
+        for (const [x, y, z, r = 0] of spots) {
+          const prop = unit.clone()
+          prop.position.set(x, y, z)
+          prop.rotation.y = r
+          this.scene.add(prop)
+        }
+      })
+    place('stage', 16, [[0, 0, -62]], false) // past the fog, so it stays lit at the end of the highway
+    place('speaker-tall', 3, [[-7.5, 0, -9, 0.4], [7.5, 0, -9, -0.4], [-8, 0, -22, 0.3], [8, 0, -22, -0.3]])
+    place('speaker-small', 1.6, [[-7.5, 3, -9, 0.4], [7.5, 3, -9, -0.4], [-8, 3, -22, 0.3], [8, 3, -22, -0.3]])
+    place('moto', 1.1, [[-7.5, 4.6, -9, 0.4], [7.5, 4.6, -9, -0.4]])
+    place('mic', 3.4, [[-4.5, 0, -6, 0.3], [4.5, 0, -6, -0.3]])
+    place('barricade', 1.2, [-1, 1].flatMap(side => Array.from({ length: 8 }, (_, i) => [side * 10.5, 0, -2 - i * 3.6, Math.PI / 2])))
   }
 
   private resize() {
@@ -272,6 +314,7 @@ export class Stage {
       b.rotation.z = Math.sin(now / 1400 + i * 1.7) * 0.5
       ;(b.material as THREE.MeshBasicMaterial).opacity = 0.05 + this.pulse * 0.18
     })
+    for (const w of this.washes) w.intensity = 40 + this.pulse * 160
 
     this.renderer.render(this.scene, this.camera)
   }
